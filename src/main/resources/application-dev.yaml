@@ -1,0 +1,9 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: my_user_password
+api:
+  openweathermap:
+    key: ba1ab467bd686c2481704212fe6cff3b
