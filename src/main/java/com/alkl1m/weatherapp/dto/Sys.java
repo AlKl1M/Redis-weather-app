@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
+/**
+ * @author AlKl1M
+ */
 public record Sys(
         @JsonProperty("type")
         int type,

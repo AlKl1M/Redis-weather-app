@@ -5,6 +5,9 @@ import com.alkl1m.weatherapp.dto.web.WeatherResponse;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * @author AlKl1M
+ */
 public record WeatherDto(
         String city,
         List<Weather> weather,
@@ -25,4 +28,5 @@ public record WeatherDto(
                 weatherData.sys()
         );
     }
+
 }
