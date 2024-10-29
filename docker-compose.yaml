@@ -57,10 +57,10 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ""
-      API_KEY: 2383700fd50e3697bea57eaabb25b907
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=""
+      - API_KEY=${API_KEY}
     ports:
       - "8080:8080"
     depends_on:
