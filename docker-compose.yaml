@@ -50,3 +50,18 @@ services:
     ports:
       - "8081:8081"
     restart: unless-stopped
+
+  weather-service:
+    image: weather-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      API_KEY: 2383700fd50e3697bea57eaabb25b907
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis

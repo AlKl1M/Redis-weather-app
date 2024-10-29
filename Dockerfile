@@ -8,7 +8,7 @@ RUN mvn clean package -DskipTests
 FROM openjdk:21-jdk-slim
 WORKDIR /app
 
-COPY --from=build /app/target/weather-service-0.0.1-SNAPSHOT.jar /app/weather-service.jar
+COPY --from=build /app/target/weatherApp-0.0.1-SNAPSHOT.jar /app/weatherApp.jar
 COPY --from=build /app/src/main/resources/ /app/resources/
 
-ENTRYPOINT ["java", "-jar", "/app/weather-service.jar"]
+ENTRYPOINT ["java", "-jar", "/app/weatherApp.jar"]
