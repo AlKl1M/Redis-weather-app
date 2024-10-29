@@ -1,9 +1,10 @@
 spring:
+  cache:
+    type: redis
   data:
     redis:
       host: localhost
-      port: 6379
-      password: my_user_password
+      port: 6380
 api:
   openweathermap:
-    key: ba1ab467bd686c2481704212fe6cff3b
+    key:

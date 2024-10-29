@@ -2,6 +2,7 @@ package com.alkl1m.weatherapp.dto;
 
 import com.alkl1m.weatherapp.dto.web.WeatherResponse;
 
+import java.io.Serializable;
 import java.util.List;
 
 public record WeatherDto(
@@ -12,7 +13,7 @@ public record WeatherDto(
         Wind wind,
         Clouds clouds,
         Sys sys
-) {
+) implements Serializable {
     public static WeatherDto fromWeatherResponse(String cityName, WeatherResponse weatherData) {
         return new WeatherDto(
                 cityName,

@@ -5,10 +5,13 @@ import com.alkl1m.weatherapp.client.WeatherClient;
 import com.alkl1m.weatherapp.dto.WeatherDto;
 import com.alkl1m.weatherapp.dto.web.GeoResponse;
 import com.alkl1m.weatherapp.dto.web.WeatherResponse;
+import com.alkl1m.weatherapp.exception.GeoDataException;
 import com.alkl1m.weatherapp.service.WeatherService;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,14 +31,19 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     @Override
+    @Cacheable(value = "weatherDataCache", key = "#cityName + '-' + #units + '-' + #lang")
     public WeatherDto getWeather(String cityName, String units, String lang) {
-        List<GeoResponse> getGeoData = getGeoData(cityName, 1);
-        WeatherResponse weatherData = weatherClient.getWeatherData(getGeoData.getFirst().lat(),
-                getGeoData.getFirst().lon(),
-                units,
-                lang,
-                apikey);
-        return WeatherDto.fromWeatherResponse(cityName, weatherData);
+        try {
+            List<GeoResponse> getGeoData = getGeoData(cityName, 1);
+            WeatherResponse weatherData = weatherClient.getWeatherData(
+                    getGeoData.getFirst().lat(),
+                    getGeoData.getFirst().lon(),
+                    units,
+                    lang,
+                    apikey);
+            return WeatherDto.fromWeatherResponse(cityName, weatherData);
+        } catch (FeignException e) {
+            throw new GeoDataException("Error fetching weather data for city: " + cityName, e);
+        }
     }
-
 }

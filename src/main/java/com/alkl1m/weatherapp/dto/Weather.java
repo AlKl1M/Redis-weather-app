@@ -2,6 +2,8 @@ package com.alkl1m.weatherapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+
 public record Weather(
         @JsonProperty("id")
         int id,
@@ -11,4 +13,4 @@ public record Weather(
         String description,
         @JsonProperty("icon")
         String icon
-) {}
+) implements Serializable {}

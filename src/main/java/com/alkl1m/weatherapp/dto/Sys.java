@@ -2,6 +2,8 @@ package com.alkl1m.weatherapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+
 public record Sys(
         @JsonProperty("type")
         int type,
@@ -13,4 +15,4 @@ public record Sys(
         long sunrise,
         @JsonProperty("sunset")
         long sunset
-) {}
+) implements Serializable {}
