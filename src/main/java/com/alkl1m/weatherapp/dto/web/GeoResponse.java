@@ -2,6 +2,8 @@ package com.alkl1m.weatherapp.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+
 public record GeoResponse(
         @JsonProperty("name")
         String name,
@@ -15,7 +17,7 @@ public record GeoResponse(
         String country,
         @JsonProperty("state")
         String state
-) {
+) implements Serializable {
     public record LocalNames(
             @JsonProperty("en") String englishName
     ) {}
