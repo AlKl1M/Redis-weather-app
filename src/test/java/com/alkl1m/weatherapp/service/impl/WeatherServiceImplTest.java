@@ -1,12 +1,11 @@
 package com.alkl1m.weatherapp.service.impl;
 
 import com.alkl1m.weatherapp.dto.WeatherDto;
+import com.alkl1m.weatherapp.service.CacheService;
 import com.alkl1m.weatherapp.service.WeatherService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -22,7 +21,7 @@ class WeatherServiceImplTest {
     @Autowired
     private WeatherService weatherService;
     @Autowired
-    private CacheManager cacheManager;
+    private CacheService cacheService;
 
     static {
         GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:latest"))
@@ -47,8 +46,7 @@ class WeatherServiceImplTest {
     void testGetWeather_withValidPayload_SavesToCache() {
         WeatherDto weather = weatherService.getWeather("Moscow", "standart", "ru");
 
-        var cache = cacheManager.getCache("weatherDataCache");
-        var cachedValue = cache.get("Moscow" + "-" + "standart" + "-" + "ru", WeatherDto.class);
+        WeatherDto cachedValue = cacheService.getFromCache("weatherDataCache", "Moscow-standart-ru");
 
         assertEquals(weather.city(), cachedValue.city());
         assertEquals(weather.weather(), cachedValue.weather());
@@ -64,14 +62,30 @@ class WeatherServiceImplTest {
         weatherService.getWeather("Kaliningrad", "standart", "ru");
         weatherService.getWeather("Krakow", "standart", "ru");
 
-        weatherService.cleanWeatherDataCache();
+        cacheService.evictCacheCategory("weatherDataCache");
 
-        Cache cache = cacheManager.getCache("weatherDataCache");
+        assertNull(cacheService.getFromCache("weatherDataCache", "Moscow-standart-ru"));
+        assertNull(cacheService.getFromCache("weatherDataCache", "Kaliningrad-standart-ru"));
+        assertNull(cacheService.getFromCache("weatherDataCache", "Krakow-standart-ru"));
+    }
 
-        assertNull(cache.get("Moscow" + "-" + "standart" + "-" + "ru", WeatherDto.class));
-        assertNull(cache.get("Kaliningrad" + "-" + "standart" + "-" + "ru", WeatherDto.class));
-        assertNull(cache.get("Krakow" + "-" + "standart" + "-" + "ru", WeatherDto.class));
+    @Test
+    void testEvictSpecificWeatherData() {
+        weatherService.getWeather("Moscow", "standard", "ru");
+        weatherService.getWeather("Kaliningrad", "standard", "ru");
+        WeatherDto moscowWeatherBeforeEvict = cacheService.getFromCache("weatherDataCache", "Moscow-standard-ru");
+        WeatherDto kaliningradWeatherBeforeEvict = cacheService.getFromCache("weatherDataCache", "Kaliningrad-standard-ru");
 
+        assertNotNull(moscowWeatherBeforeEvict);
+        assertNotNull(kaliningradWeatherBeforeEvict);
+
+        cacheService.evictCacheCategory("weatherDataCache");
+
+        WeatherDto moscowWeatherAfterEvict = cacheService.getFromCache("weatherDataCache", "Moscow-standard-ru");
+        WeatherDto kaliningradWeatherAfterEvict = cacheService.getFromCache("weatherDataCache", "Kaliningrad-standard-ru");
+
+        assertNull(moscowWeatherAfterEvict);
+        assertNull(kaliningradWeatherAfterEvict);
     }
 
 }
