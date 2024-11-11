@@ -5,18 +5,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
 /**
- * Конфигурация для настройки подключения к Redis и кэша.
- *
  * @author AlKl1M
  */
 @Configuration
@@ -33,9 +30,9 @@ public class RedisConfig {
     private String password;
 
     /**
-     * Создает и настраивает фабрику соединений Lettuce для Redis.
+     * Конфигурирует соединение с Redis с использованием Lettuce ConnectionFactory.
      *
-     * @return настроенная фабрика соединений Lettuce
+     * @return настроенное подключение к Redis с пулом подключений
      */
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
@@ -61,31 +58,20 @@ public class RedisConfig {
     }
 
     /**
-     * Создает и настраивает RedisTemplate для работы с Redis.
+     * Конфигурирует RedisTemplate для работы с Redis, используя Lettuce.
+     * Устанавливает сериализаторы для ключей и значений как StringRedisSerializer.
      *
-     * @return настроенный объект RedisTemplate
+     * @return настроенный RedisTemplate для работы с Redis
      */
     @Bean
     public RedisTemplate<String, String> redisTemplate() {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(lettuceConnectionFactory());
-        redisTemplate.setDefaultSerializer(
-                new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.setEnableTransactionSupport(true);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
-    }
-
-    /**
-     * Конфигурирует параметры кэша Redis, включая время жизни элементов.
-     *
-     * @return настройки кэша Redis
-     */
-    @Bean
-    public RedisCacheConfiguration cacheConfiguration() {
-        return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofHours(1))
-                .disableCachingNullValues();
     }
 
 }
