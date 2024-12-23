@@ -29,6 +29,21 @@ public class RedisConfig {
     @Value("${spring.data.redis.password}")
     private String password;
 
+    @Value("${redis.pool.max-wait:3000}")
+    private long maxWait;
+
+    @Value("${redis.pool.max-idle:8}")
+    private int maxIdle;
+
+    @Value("${redis.pool.min-idle:4}")
+    private int minIdle;
+
+    @Value("${redis.pool.max-total:3000}")
+    private int maxTotal;
+
+    @Value("${redis.command.timeout:3000}")
+    private long commandTimeout;
+
     /**
      * Конфигурирует соединение с Redis с использованием Lettuce ConnectionFactory.
      *
@@ -42,15 +57,15 @@ public class RedisConfig {
         config.setPassword(password);
         config.setDatabase(0);
 
-        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
-        poolConfig.setMaxWait(Duration.ofMillis(3000));
-        poolConfig.setMaxIdle(8);
-        poolConfig.setMinIdle(4);
-        poolConfig.setMaxTotal(3000);
+        GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
+        poolConfig.setMaxWait(Duration.ofMillis(maxWait));
+        poolConfig.setMaxIdle(maxIdle);
+        poolConfig.setMinIdle(minIdle);
+        poolConfig.setMaxTotal(maxTotal);
 
         LettucePoolingClientConfiguration poolingClientConfiguration =
                 LettucePoolingClientConfiguration.builder()
-                        .commandTimeout(Duration.ofMillis(3000))
+                        .commandTimeout(Duration.ofMillis(commandTimeout))
                         .poolConfig(poolConfig)
                         .build();
 
