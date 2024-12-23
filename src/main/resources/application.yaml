@@ -1,0 +1,11 @@
+spring:
+  cache:
+    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+api:
+  openweathermap:
+    key: ${API_KEY}
